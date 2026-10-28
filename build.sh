@@ -9,8 +9,16 @@ cd "$(dirname "$0")"
 VERSION="${VERSION:-$(cat VERSION)}"
 APP=build/ClaudeNotch.app
 
-swift build -c release --arch arm64 --arch x86_64
-BIN=.build/apple/Products/Release/ClaudeNotch
+# One build per architecture (plain SwiftPM), merged with lipo. The multi-arch
+# `--arch a --arch b` path goes through xcbuild, which breaks on some Xcode versions.
+SLICES=()
+for ARCH in arm64 x86_64; do
+  swift build -c release --arch "$ARCH" --scratch-path ".build/$ARCH"
+  SLICES+=(".build/$ARCH/release/ClaudeNotch")
+done
+mkdir -p build
+BIN=build/ClaudeNotch-universal
+lipo -create -output "$BIN" "${SLICES[@]}"
 
 # App icon (generated once, cached in Resources/).
 if [[ ! -f Resources/AppIcon.icns ]]; then
