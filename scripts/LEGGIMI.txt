@@ -1,0 +1,24 @@
+CLAUDE NOTCH — installazione
+============================
+
+1. Trascina "ClaudeNotch" nella cartella "Applications".
+2. Apri l'app da Applicazioni (o Spotlight: "Claude Notch").
+
+Primo avvio
+-----------
+L'app non è firmata da Apple, quindi macOS al primo avvio la blocca.
+  • Vai su Impostazioni di Sistema → Privacy e sicurezza
+  • In fondo, accanto a "ClaudeNotch è stata bloccata", clicca "Apri comunque".
+In alternativa, da Terminale:
+  xattr -dr com.apple.quarantine /Applications/ClaudeNotch.app
+
+Requisiti
+---------
+  • macOS 14 Sonoma o successivo (Apple Silicon o Intel)
+  • Claude Code installato e con login effettuato (comando: claude)
+    L'app legge i limiti dal login di Claude Code, nessuna chiave da inserire.
+
+Uso
+---
+  • Passa il mouse sul notch → si espande con sessione 5h, settimana e token di oggi.
+  • Clic destro sul notch → Impostazioni, avvio automatico, aggiorna, esci.

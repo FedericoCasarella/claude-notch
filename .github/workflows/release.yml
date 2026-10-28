@@ -1,0 +1,47 @@
+# On every push to main: if VERSION names a release that doesn't exist yet,
+# build the universal app, package the DMG and publish it as GitHub Release "v<VERSION>".
+# Installed copies of Claude Notch pick it up within 30 minutes and update themselves.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "value=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if already released
+        id: exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.version.outputs.value }}" >/dev/null 2>&1; then
+            echo "value=true" >> "$GITHUB_OUTPUT"
+            echo "v${{ steps.version.outputs.value }} already released, nothing to do."
+          else
+            echo "value=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build DMG
+        if: steps.exists.outputs.value == 'false'
+        run: scripts/make-dmg.sh
+
+      - name: Publish release
+        if: steps.exists.outputs.value == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.version.outputs.value }}"
+          gh release create "v$V" "dist/ClaudeNotch-$V.dmg" \
+            --title "Claude Notch $V" --generate-notes --latest
