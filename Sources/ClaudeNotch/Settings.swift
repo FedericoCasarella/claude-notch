@@ -20,17 +20,22 @@ final class AppSettings: ObservableObject {
     @Published var showRAM: Bool {
         didSet { d.set(showRAM, forKey: "showRAM") }
     }
+    @Published var showDisk: Bool {
+        didSet { d.set(showDisk, forKey: "showDisk") }
+    }
     @Published var autoUpdate: Bool {
         didSet { d.set(autoUpdate, forKey: "autoUpdate") }
     }
 
-    var showsSystem: Bool { showCPU || showRAM }
+    var showsSystem: Bool { systemMetricCount > 0 }
+    var systemMetricCount: Int { [showCPU, showRAM, showDisk].filter { $0 }.count }
 
     private init() {
         d.register(defaults: ["refreshInterval": 120.0, "haptics": true,
-                              "showCPU": false, "showRAM": false, "autoUpdate": true])
+                              "showCPU": false, "showRAM": false, "showDisk": false, "autoUpdate": true])
         showCPU = d.bool(forKey: "showCPU")
         showRAM = d.bool(forKey: "showRAM")
+        showDisk = d.bool(forKey: "showDisk")
         autoUpdate = d.bool(forKey: "autoUpdate")
         // Under a minute the endpoint starts answering 429.
         refreshInterval = max(d.double(forKey: "refreshInterval"), 60)
@@ -110,6 +115,10 @@ struct SettingsView: View {
                 Toggle(isOn: $settings.showRAM) {
                     Text("Utilizzo RAM")
                     Text("Memoria usata come in Monitoraggio Attività.")
+                }
+                Toggle(isOn: $settings.showDisk) {
+                    Text("Spazio su disco")
+                    Text("Spazio occupato e libero del disco di avvio.")
                 }
             } header: { Text("Monitor di sistema") }
 

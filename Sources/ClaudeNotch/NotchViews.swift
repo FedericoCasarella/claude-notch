@@ -78,6 +78,7 @@ struct NotchRootView: View {
         .animation(open ? Theme.open : Theme.close, value: open)
         .animation(Theme.open, value: settings.showCPU)
         .animation(Theme.open, value: settings.showRAM)
+        .animation(Theme.open, value: settings.showDisk)
         .preferredColorScheme(.dark)
     }
 }
@@ -111,6 +112,10 @@ struct CollapsedView: View {
                 }
                 if settings.showRAM {
                     MiniRing(value: system.ram, symbol: "memorychip")
+                        .transition(.scale.combined(with: .opacity))
+                }
+                if settings.showDisk {
+                    MiniRing(value: system.disk, symbol: "internaldrive")
                         .transition(.scale.combined(with: .opacity))
                 }
                 DualRing(outer: store.session?.used, inner: store.weekly?.used)
@@ -194,7 +199,7 @@ struct ExpandedView: View {
                     TodayCard(usage: store.today, index: 2)
                     if settings.showsSystem {
                         SystemCard(index: 3)
-                            .frame(width: 140)
+                            .frame(width: SystemCard.width(metrics: settings.systemMetricCount))
                             .transition(.blurFade(scale: 0.9))
                     }
                 }
@@ -373,9 +378,11 @@ struct TodayCard: View {
     }
 }
 
-/// Live CPU / RAM rings (only the enabled ones).
+/// Live CPU / RAM / disk rings (only the enabled ones).
 struct SystemCard: View {
     let index: Int
+
+    static func width(metrics: Int) -> CGFloat { metrics >= 3 ? 200 : 140 }
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var system = SystemMonitor.shared
 
@@ -391,6 +398,9 @@ struct SystemCard: View {
                 if settings.showCPU { metric("CPU", system.cpu, detail: "\(ProcessInfo.processInfo.activeProcessorCount) core") }
                 if settings.showRAM {
                     metric("RAM", system.ram, detail: String(format: "%.1f/%.0f GB", system.ramUsedGB, system.ramTotalGB))
+                }
+                if settings.showDisk {
+                    metric("Disco", system.disk, detail: String(format: "%.0f GB liberi", system.diskFreeGB))
                 }
             }
             .frame(maxWidth: .infinity)

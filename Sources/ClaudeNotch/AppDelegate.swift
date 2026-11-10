@@ -12,12 +12,12 @@ final class NotchModel: ObservableObject {
     static let edgeInset: CGFloat = 17
     static let openSize = CGSize(width: 540, height: 0) // height derived from notch
 
-    /// Each enabled CPU/RAM mini ring widens both sides equally so the notch stays centred.
+    /// Each enabled CPU/RAM/disk mini ring widens both sides equally so the notch stays centred.
     static let miniRingSlot: CGFloat = 23
 
     var sideWidth: CGFloat {
         let s = AppSettings.shared
-        return Self.sideWidth + Self.miniRingSlot * CGFloat((s.showCPU ? 1 : 0) + (s.showRAM ? 1 : 0))
+        return Self.sideWidth + Self.miniRingSlot * CGFloat(s.systemMetricCount)
     }
 
     var closedSize: CGSize {
@@ -25,7 +25,8 @@ final class NotchModel: ObservableObject {
     }
 
     var openSize: CGSize {
-        let extra: CGFloat = AppSettings.shared.showsSystem ? 152 : 0
+        let s = AppSettings.shared
+        let extra: CGFloat = s.showsSystem ? SystemCard.width(metrics: s.systemMetricCount) + 12 : 0
         return CGSize(width: Self.openSize.width + extra, height: notchSize.height + 192)
     }
 }

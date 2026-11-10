@@ -4,7 +4,7 @@ Notch animato per macOS che mostra quanto resta dei limiti di Claude: sessione 5
 
 - **Hover** sul notch → si espande (anelli animati, countdown al reset, grafico orario di oggi)
 - **Clic destro** → Impostazioni, avvio al login, controlla aggiornamenti, esci
-- **Monitor di sistema** (opzionale) → anelli CPU e RAM in tempo reale
+- **Monitor di sistema** (opzionale) → anelli CPU, RAM e spazio disco in tempo reale
 - **Aggiornamenti automatici** da GitHub Releases ogni 30 minuti
 
 Dati: endpoint usage di Anthropic (lo stesso di `/usage` in Claude Code) usando il login di Claude Code nel Portachiavi, più i transcript locali in `~/.claude/projects` per i token di oggi.
